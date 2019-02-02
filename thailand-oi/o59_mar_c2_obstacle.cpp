@@ -44,18 +44,12 @@ int main() {
         return get<0>(a) * get<1>(b) >  get<0>(b) * get<1>(a);
     });
     int l = 1, r = n;
-    for(int i = 1, sum = H[1]; i <= n; i++) {
-        if(sum > s) break;
-        sum += H[i+1] + 1, ++l;
+    while(l < r) {
+        int m = (l + r) >> 1;
+        if(f(m) > f(m + 1)) r = m;
+        else l = m+1;
     }
-    while(r - l > 2) {
-        int m1 = (l + l + r) / 3, m2 = (l + r + r) / 3;
-        if(f(m1) <= f(m2)) l = m1 + 1;
-        else r = m2 - 1;
-    }
-    long ret = 0;
-    for(int i = l; i <= r; i++) ret = max(ret, f(i));
-    printf("%lld\n", ret);
+    printf("%lld\n", f(r));
 
     return 0;
 }
