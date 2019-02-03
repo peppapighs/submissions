@@ -11,22 +11,33 @@ using namespace std;
 const int N = 2e3+5;
 
 int n, s, H[N];
-pii sel[N];
 vector<iii> V;
 
 long f(int mid) {
-    int k = s - mid + 1;
     long ret = 0;
-    fill_n(sel, N, pii(0, 0));
-    for(iii &v : V) {
+    int k = s - mid + 1;
+    bool S[N];
+    pii B[N];
+    memset(S, 0, sizeof S);
+    fill_n(B, N, pii(0, 0));
+    for(int i = 0; i < V.size(); i++) {
         long pre, h, idx;
-        tie(pre, h, idx) = v;
+        tie(pre, h, idx) = V[i];
         if(idx > mid) continue;
-        if(!sel[idx].x && k - h >= 0)
-            ret += pre, k -= h, sel[idx] = pii(pre, h);
-        else if(sel[idx].x && h > sel[idx].y && k + sel[idx].y - h >= 0)
-            ret += pre - sel[idx].x, k -= h - sel[idx].y, sel[idx] = pii(pre, h);
+        if(B[idx] == pii(0, 0) && k >= h) {
+            ret += pre;
+            B[idx] = pii(pre, h), S[i] = true;
+        }
     } 
+    if(k > 0) for(int i = 0; i < V.size(); i++) {
+        if(S[i]) continue;
+        long pre, h, idx;
+        tie(pre, h, idx) = V[i];
+        if(k >= h - B[idx].y) {
+            ret += pre - B[idx].y;
+            B[idx] = pii(pre, h); 
+        }
+    }
     return ret;
 }
 
