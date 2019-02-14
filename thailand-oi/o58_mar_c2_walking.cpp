@@ -7,10 +7,23 @@
 using namespace std;
 
 const int N = 6e3+5;
+const int M = 1e6+5;
 
-int n, k, A[N];
-int chk[N], sz[N], dp[N], t[N], cnt, L, ans;
+int n, k, ans = 1e9, A[N];
+int chk[N], sz[N], cnt;
+int t[M<<1];
 vector<int> g[N];
+
+void update(int x, int k, bool clear = false) { for(t[x += M] = clear ? k : min(t[x], k); x != 1; x >>= 1) t[x>>1] = min(t[x], t[x^1]); }
+
+int query(int l, int r) {
+    int ret = 1e9;
+    for(l += M, r += M+1; l < r; l >>= 1, r >>= 1) {
+        if(l & 1) ret = min(ret, t[l++]);
+        if(r & 1) ret = min(ret, t[--r]);
+    }
+    return ret;
+}
 
 int getsz(int u, int p) { sz[u] = 1; for(int v : g[u]) if(!chk[v] && v != p) sz[u] += getsz(v, u); return sz[u]; }
 
@@ -21,13 +34,17 @@ int findcen(int u, int p, int all, pii &ret) {
     return sz[u];
 }
 
-void dfs(int u, int p, int len, int val, int st, bool fill) {
-    if(len > L) return;
+void dfs(int u, int p, int len, int sum, int st, bool fill) {
     if(!fill) {
-        if(len == L) ans = max(ans, val + A[st]);
-        else if(t[L - len] == cnt) ans = max(ans, val + dp[L - len] + A[st]);
-    } else if(t[len] < cnt || dp[len] < val) dp[len] = val, t[len] = cnt;
-    for(int v : g[u]) if(!chk[v] && v != p) dfs(v, u, len + 1, val + A[v], st, fill);
+        if(sum + A[st] >= k) ans = min(ans, len);
+        else ans = min(ans, query(k - A[st] - sum, M-1) + len);
+    } else if(sum + A[st] < k) update(sum, len);
+    for(int v : g[u]) if(!chk[v] && v != p) dfs(v, u, len + 1, sum + A[v], st, fill);
+}
+
+void clear(int u, int p, int sum) {
+    update(sum, 1e9, true);
+    for(int v : g[u]) if(!chk[v] && v != p) clear(v, u, sum + A[v]);
 }
 
 void proc(int u) {
@@ -39,33 +56,21 @@ void proc(int u) {
         dfs(v, u, 1, A[v], u, 0);
         dfs(v, u, 1, A[v], u, 1);
     } 
+    for(int v : g[u]) if(!chk[v]) clear(v, u, A[v]);
     chk[u] = 1;
     for(int v : g[u]) if(!chk[v]) proc(v);
 }
 
-int f(int mid) {
-    L = mid, ans = -1;
-    memset(chk, 0, sizeof chk), memset(sz, 0, sizeof sz);
-    proc(0);
-    return ans;
-}
-
 int main() {
+    fill_n(t, M<<1, 1e9);
     scanf("%d %d", &n, &k);
     for(int i = 0; i < n; i++) scanf("%d", A+i);
     for(int i = 1, a, b; i < n; i++) {
         scanf("%d %d", &a, &b);
         g[a].emplace_back(b), g[b].emplace_back(a);
     }
-    int l = 1, r = n;
-    bool valid = false;
-    while(l < r) {
-        int mid = l + r >> 1;
-        if(f(mid) >= k) r = mid, valid = true;
-        else l = mid + 1;
-    }
-    if(valid) printf("%d\n", r);
-    else printf("-1\n");
+    proc(0);
+    printf("%d\n", ans);
 
     return 0;
 }
