@@ -12,7 +12,7 @@ char A[N];
 
 int main() {
     scanf("%d %d", &n, &m);
-    scanf(" %s", A+1);
+    scanf(" %s", A + 1);
     for(int i = 1; i <= n; i++) {
         mx[i] = mx[i - 1], mn[i] = mn[i - 1], cur[i] = cur[i - 1];
         if(A[i] == 'L') ++cur[i];
@@ -24,7 +24,7 @@ int main() {
         for(int a = 0; a <= 2; a++) for(int b = -2; b <= 0; b++) for(int x = -2; x <= 2; x++) {
             dp[now][a][2 + b][2 + x] = 0;
             if(a - b > 2 || x < b || x > a) continue;
-            if(i == n) dp[now][a][2+b][2+x] = 1;
+            if(i == n) dp[now][a][2 + b][2 + x] = 1;
             else {
                 if(x < 2 && max(a, x + 1) - b <= 2) dp[now][a][2 + b][2 + x] += dp[pre][max(a, x + 1)][2 + b][3 + x];
                 if(x > -2 && a - min(b, x - 1) <= 2) dp[now][a][2 + b][2 + x] += dp[pre][a][2 + min(b, x - 1)][1 + x];
