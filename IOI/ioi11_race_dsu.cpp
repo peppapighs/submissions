@@ -1,6 +1,7 @@
-//#include <race.h>
+#include <race.h>
 #include <bits/stdc++.h>
 
+#define long long long
 #define pii pair<int, int>
 #define x first
 #define y second
@@ -8,75 +9,59 @@
 using namespace std;
 
 const int N = 2e5 + 5;
-const int M = 1e6 + 5;
 
-int n, k, ans = -1;
-int sub[N], d[N], dep[N];
-int dp[M], tim[M];
+int n, k, ans = INT_MAX;
+int hv[N], in[N], out[N], pos[N], par[N], dep[N];
+long d[N];
+map<long, int> mp;
 vector<pii> g[N];
 
-int getsz(int u = 0, int p = 0, int w = 0, int l = 0) {
-	sub[u] = 1;
-	d[u] = d[p] + w;
-	dep[u] = l;
-	for(pii v : g[u]) if(v.x != p) sub[u] += getsz(v.x, u, v.y, l + 1);
-	return sub[u];	
+int gethv(int u, int p) {
+	static int idx = 0;
+	int sz = 1; pii ret(0, -1);
+	par[u] = p, in[u] = ++idx, pos[idx] = u;
+	for(pii v : g[u]) if(v.x != p) {
+		d[v.x] = d[u] + v.y;
+		dep[v.x] = dep[u] + 1;
+		int z = gethv(v.x, u);
+		sz += z, ret = max(ret, pii(z, v.x));
+	}
+	out[u] = idx, hv[u] = ret.y;
+	return sz;
 }
 
-void add(int u, int p, int st, int gp) {
-	if(d[u] - d[st] > k) return;
-	if((tim[k - d[u] + 2*d[st]] == gp || tim[k - d[u] + 2*d[st]] == st) && (ans == -1 || dep[u] - dep[st] + dp[k - d[u] + 2*d[st]] < ans)) ans = dep[u] - dep[st] + dp[k - d[u] + 2*d[st]];
-	if(d[u] - d[st] == k && (ans == -1 || dep[u] - dep[st] < ans)) ans = dep[u] - dep[st];
-	for(pii v : g[u]) if(v.x != p) add(v.x, u, st, gp);
+void add(int u) {
+	if(!mp.count(d[u])) mp[d[u]] = dep[u];
+	else mp[d[u]] = min(mp[d[u]], dep[u]);
 }
 
-void prep(int u, int p, int st) {
-	if(d[u] - d[st] > k) return;
-	if(tim[d[u]] != st || dep[u] < dp[d[u]]) tim[d[u]] = st, dp[d[u]] = dep[u];
-	for(pii v : g[u]) if(v.x != p) prep(v.x, u, st);
+void getans(int u, int lca) {
+	long ret = k - d[u] + 2*d[lca];
+	if(mp.count(ret)) {
+		int z = mp[ret] + dep[u] - 2*dep[lca];
+		ans = min(ans, z);
+	}
 }
 
 void dfs(int u, int p, bool keep) {
-	int mx = 0, hv;
-	for(pii v : g[u]) if(v.x != p && mx < sub[v.x]) mx = sub[v.x], hv = v.x;
-	for(pii v : g[u]) if(v.x != p && v.x != hv) dfs(v.x, u, 0);
-	if(mx) dfs(hv, u, 1);
-	for(pii v : g[u]) if(v.x != p && v.x != hv) {
-		add(v.x, u, u, mx ? hv : INT_MAX);
-		prep(v.x, u, u);
+	for(pii v : g[u]) if(v.x != p && v.x != hv[u]) dfs(v.x, u, 0);
+	if(hv[u] != -1) dfs(hv[u], u, 1);
+	getans(u, u), add(u);
+	for(pii v : g[u]) if(v.x != p && v.x != hv[u]) {
+		for(int i = in[v.x]; i <= out[v.x]; i++) getans(pos[i], u);
+		for(int i = in[v.x]; i <= out[v.x]; i++) add(pos[i]);
 	}
-	if((tim[k + d[u]] == u || tim[k + d[u]] == hv) && (ans == -1 || dp[k + d[u]] - dep[u] < ans)) ans = dp[k + d[u]] - dep[u]; 
-	printf("%d - %d: ", u, keep);
-	for(int i = 1; i <= 20 ; i++) {if(tim[i] == u || tim[i] == hv) printf("%d(%d) ", dp[i], tim[i]); else printf("X(%d) ", tim[i]);}
-	printf("\n");
-	if(keep && (tim[d[u]] != u || dp[d[u]] > dep[u])) tim[d[u]] = u, dp[d[u]] = dep[u];
+	if(!keep) mp.clear();
 }
 
-int best_path(int N, int K, int H[][2], int L[])
-{
+int best_path(int N, int K, int H[][2], int L[]) {
 	n = N, k = K;
 	for(int i = 0; i < N - 1; i++) {
 		g[H[i][0]].emplace_back(H[i][1], L[i]);
 		g[H[i][1]].emplace_back(H[i][0], L[i]);
 	}
-	fill(begin(tim), end(tim), -1);
-	getsz();
+	gethv(0, 0);
 	dfs(0, 0, 1);
  
-	return ans;
-}
-
-int main() {
-	scanf("%d%d", &n, &k);
-	for(int i = 1, u, v, w; i <= n; i++) {
-		scanf("%d%d%d", &u, &v, &w);
-		g[u].emplace_back(v, w);
-		g[v].emplace_back(u, w);
-	}
-	fill(begin(tim), end(tim), -1);
-	getsz();
-	dfs(0, 0, 1);	
-	printf("%d", ans);
-
-	return 0;
+	return ans == INT_MAX ? -1 : ans;
 }
