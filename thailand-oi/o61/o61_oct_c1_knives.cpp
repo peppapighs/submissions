@@ -1,137 +1,79 @@
-// [ [PP][-PPP][PPPP][xxxxxxxx] ] 
 #include <bits/stdc++.h>
 
 #define long long long
-#define iii tuple<char, int, int>
 
 using namespace std;
 
-const int N = 1<<20;
+const int N = 1e6+5;
 
-int n, L, q;
-int ps[N+5];
-long val[N+5], lz[N<<1];
-vector<iii> ask;
+void update(long t[], int x, int k) { for(int i = x+1; i < N; i += i & -i) t[i] += k; }
 
-void push(int p, int l, int r) {
-       if(lz[p]) {
-              if(l == r) val[l] += lz[p];
-              else {
-                     lz[p<<1] += lz[p];
-                     lz[p<<1|1] += lz[p];
-              }
-              lz[p] = 0;
-       }
+long query(long t[], int x) {
+    long ret = 0;
+    for(int i = x+1; i; i -= i & -i) ret += t[i];
+    return ret;
 }
 
-void update(int x, int y, long k, int p = 1, int l = 0, int r = L) {
-       push(p, l, r);
-       if(x > r || l > y) return;
-       if(x <= l && r <= y) {
-              lz[p] += k;
-              push(p, l, r);
-              return;
-       }
-       int m = (l + r) >> 1;
-       update(x, y, k, p<<1, l, m), update(x, y, k, p<<1|1, m+1, r);
-}
+long get(long t[], int x) { return query(t, x) - query(t, x-1); }
 
-long query(int x, int p = 1, int l = 0, int r = L) {
-       push(p, l, r);
-       if(l == r) return val[l];
-       int m = (l + r) >> 1;
-       if(x <= m) return query(x, p<<1, l, m);
-       else return query(x, p<<1|1, m+1, r);
-}
+int n, l, q, fcnt;
+bool flip[N];
+long t[3][N]; //Position of knives, Not Flip, Flip
 
-bool fuck;
-vector<int> shit;
-int vl[1005][20005];
-int flip[1005];
+/* P_i = Position of the bottom of the knife, x = Query position
 
-int get(int x) { return lower_bound(shit.begin(), shit.end(), x) - shit.begin(); }
+For non-flip knives :
+P_i >= x : x - P_i + L
+P_i < x : x - P_i
+
+For flip knives :
+P_i > x : P_i - x
+P_i <= x : P_i - x + L
+
+Sum of these are the answer of each query
+*/
 
 int main() {
-       scanf("%d %d %d", &n, &L, &q);
-       for(int i = 1; i <= q; i++) {
-              char c;
-              int a, b;
-              scanf(" %c %d", &c, &a);
-              if(c == 's') scanf("%d", &b);
-              if(c == 'f') fuck = true;
-              if(c == 'q') shit.emplace_back(a);
-              ask.emplace_back(c, a, b);              
-       }
-       sort(shit.begin(), shit.end());
-       shit.erase(unique(shit.begin(), shit.end()), shit.end());
-       if(!fuck) {
-              for(int i = 0; i <= L; i++) val[i] = 1LL*i*n;
-              fill_n(ps, N+5, L);
-              for(iii tup : ask) {
-                     char c;
-                     int a, b;
-                     tie(c, a, b) = tup;
-                     if(c == 's') {
-                            ++a;
-                            int nps = ((ps[a] - 1 + b) % L) + 1;
-                            if(nps < ps[a]) {
-                                   b = ps[a] - nps;
-                                   update(0, nps, b);
-                                   update(nps+1, nps+b, b-L);
-                                   update(nps+b+1, L, b);
-                            } else if(nps > ps[a]) {
-                                   update(0, ps[a], -b);
-                                   update(ps[a]+1, ps[a]+b, L-b);
-                                   update(ps[a]+b+1, L, -b);
-                            }
-                            ps[a] = nps;
-                     } else if(c == 'q') {
-                            printf("%lld\n", query(a));
-                     }
-              }
-       } else {
-              for(int i = 1; i <= n; i++) {
-                     ps[i] = L, flip[i] = 0;
-                     for(int j = 0; j < shit.size(); j++)
-                            vl[i][j] = shit[j];
-              }
-              for(iii tup : ask) {
-                     char c;
-                     int a, b;
-                     c = get<0>(tup), a = get<1>(tup), b = get<2>(tup);
-                     if(c == 's') {
-                            ++a;
-                            int nps = ((ps[a] - 1 + b) % L) + 1;
-                            for(int j = 0; j < shit.size(); j++) {
-                                   if(nps < ps[a]) {
-                                          b = ps[a] - nps;
-                                          if(shit[j] <= nps) vl[a][j] += b;
-                                          else if(shit[j] <= nps+b) vl[a][j] += b-L;
-                                          else vl[a][j] += b;
-                                   } else {
-                                          if(shit[j] <= ps[a]) vl[a][j] -= b;
-                                          else if(shit[j] <= ps[a]+b) vl[a][j] -= b-L;
-                                          else vl[a][j] -= b;
-                                   }
-                            }
-                            ps[a] = nps;
-                     } else if(c == 'q') {
-                            long ans = 0;
-                            for(int i = 1; i <= n; i++) {
-                                   if(!flip[i]) ans += vl[i][get(a)];
-                                   else {
-                                          if(ps[i] == n) ans += L-vl[i][get(a)];
-                                          else if(vl[i][get(a)] != L) ans += L-vl[i][get(a)];
-                                          else ans += vl[i][get(a)];
-                                   }
-                            }
-                            printf("%lld\n", ans);
-                     } else {
-                            ++a;
-                            flip[a] ^= 1;
-                     }
-              }
-       }
+    scanf("%d %d %d", &n, &l, &q);
+    for(int i = 1; i <= n; i++) {
+        update(t[0], i, -l);
+        update(t[1], l, 1);
+    }
+    for(int i = 1; i <= q; i++) {
+        char T;
+        int a, b;
+        scanf(" %c %d", &T, &a);
+        if(T == 's') {
+            ++a;
+            scanf("%d", &b);
+            int now = get(t[0], a), next;
+            if(!flip[a]) now *= -1;
+            update(t[flip[a]+1], now, -1);
+            next = now + b;
+            if(!flip[a]) next = (next - 1) % l + 1;
+            else next %= l;
+            update(t[0], a, (flip[a] ? 1ll : -1ll) * next - get(t[0], a));
+            update(t[flip[a]+1], next, 1);
+        } else if(T == 'f') {
+            ++a;
+            int now = get(t[0], a), next;
+            if(!flip[a]) now *= -1;
+            update(t[flip[a]+1], now, -1);
+            if(!flip[a] && now == l) next = 0;
+            else if(flip[a] && now == 0) next = l;
+            else next = now;
+            flip[a] ^= 1;
+            if(flip[a]) ++fcnt;
+            else --fcnt;
+            update(t[0], a, (flip[a] ? 1ll : -1ll) * next - get(t[0], a));
+            update(t[flip[a]+1], next, 1);
+        } else {
+            long sum = query(t[0], n);
+            long geq = query(t[1], l) - query(t[1], a-1);
+            long leq = query(t[2], a);
+            printf("%lld\n", 1ll*a*(n - 2*fcnt) + sum + 1ll*l*(geq + leq));
+        }
+    }
 
-       return 0;
+    return 0;
 }
