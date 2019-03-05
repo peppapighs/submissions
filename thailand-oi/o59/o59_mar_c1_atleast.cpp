@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 
+#define long long long
 #define pii pair<int, int>
 #define x first
 #define y second
@@ -8,56 +9,58 @@ using namespace std;
 
 const int N = 1e5+5;
 
-struct query {
-	int l, r;
-	double avg;
-	query() {}
+struct item {
+    int l, r;
+    double k;
+    item() { }
 };
 
-int n, m, todo = 1;
-int ans[N];
-long long A[N], t[N][2];
-query Q[N];
-pii bs[N], V[N];
-queue<int> P[N];
+void update(long t[], int x, long k) { for(int i = x; i < N; i += i & -i) t[i] += k; }
 
-void update(int x, int k, int y) { for(int i = x; i <= n; i += i&(-i)) t[i][y] += k; }
-long long query(int x, int y) {
-	long long sum = 0;
-	for(int i = x; i; i -= i&(-i)) sum += t[i][y];
-	return sum;
+long query(long t[], int x) {
+    long ret = 0;
+    for(int i = x; i; i -= i & -i) ret += t[i];
+    return ret;
 }
 
-int main() {
-	scanf("%d %d", &n, &m);
-	fill(begin(bs), end(bs), pii(1, n));
-	for(int i = 1; i <= n; i++) scanf("%lld", A+i), V[i] = pii(A[i], i);
-	for(int i = 1; i <= m; i++) scanf("%d %d %lf", &Q[i].l, &Q[i].r, &Q[i].avg);
-	sort(V+1, V+n+1, greater<pii>());
-	while(todo) {
-		todo = 0;
-		memset(t, 0, sizeof t);
-		for(int i = 1; i <= m; i++) if(bs[i].x <= bs[i].y) P[(bs[i].x + bs[i].y) >> 1].emplace(i), todo++;
-		for(int i = 1; i <= n; i++) {
-			update(V[i].y, V[i].x, 0), update(V[i].y, 1, 1);
-			while(!P[i].empty()) {
-				int now = P[i].front();
-				P[i].pop();
-				long long sum = query(Q[now].r, 0) - query(Q[now].l-1, 0);
-				long long cnt = query(Q[now].r, 1) - query(Q[now].l-1, 1);
-				if(!cnt) {
-					bs[now].y = i-1;
-					continue;
-				}
-				if((double)sum/cnt >= Q[now].avg) bs[now].x = i+1, ans[now] = (int)cnt;
-				else bs[now].y = i-1;
-			}
-		}
-	}
-	for(int i = 1; i <= m; i++) {
-		if(ans[i]) printf("%d\n", Q[i].r-Q[i].l+1-ans[i]);
-		else printf("-1\n");
-	}
+int n, q;
+long A[N], t[2][N], ans[N];
+item Q[N];
+vector<long> V;
 
-	return 0;
+int main() {
+    fill_n(ans, N, -1);
+    scanf("%d %d", &n, &q);
+    for(int i = 1; i <= n; i++) scanf("%lld", A+i), V.emplace_back(i);
+    for(int i = 1; i <= q; i++) scanf("%d %d %lf", &Q[i].l, &Q[i].r, &Q[i].k);
+    vector<pii> B(n+1, pii(1, n));
+    vector<queue<int> > pos(n+1);
+    sort(V.begin(), V.end(), [&](const int &a, const int &b) {
+        return A[a] > A[b];
+    });
+    for(int step = 1; step <= n; step <<= 1) {
+        memset(t[0], 0, sizeof t[0]), memset(t[1], 0, sizeof t[1]);
+        for(int i = 1; i <= q; i++) if(B[i].x < B[i].y)
+            pos[(B[i].x + B[i].y + 1) >> 1].emplace(i);
+        for(int i = 1; i <= n; i++) {
+            update(t[0], V[i-1], 1), update(t[1], V[i-1], A[V[i-1]]);
+            while(!pos[i].empty()) {
+                int now = pos[i].front(); pos[i].pop();
+                long cnt = query(t[0], Q[now].r) - query(t[0], Q[now].l-1);
+                long sum = query(t[1], Q[now].r) - query(t[1], Q[now].l-1);
+                if(!cnt) B[now].x = i + 1;
+                else {
+                    double avg = (double)sum / (double)cnt;
+                    if(Q[now].k <= avg) B[now].x = i, ans[now] = cnt;
+                    else B[now].y = i - 1;
+                }
+            }
+        }
+    }
+    for(int i = 1; i <= q; i++) {
+        if(ans[i] == -1) printf("-1\n");
+        else printf("%lld\n", Q[i].r - Q[i].l + 1 - ans[i]);
+    }
+
+    return 0;
 }
