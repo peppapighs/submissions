@@ -43,17 +43,14 @@ void dfs(int u) {
             if(M[par[u]]->l) M[par[u]]->l->r = now;
             M[par[u]]->l = now;
             M[u] = now;
-
-            sig[par[u]] = 1;
         } else {
             node *now = new node(u);
             now->l = M[par[u]], now->r = M[par[u]]->r;
             if(M[par[u]]->r) M[par[u]]->r->l = now;
             M[par[u]]->r = now;
             M[u] = now;
-
-            sig[par[u]] = -1;
         }
+        sig[par[u]] = -sig[inv[low[u]]];
     }
     for(int v : g[u]) if(!chk[v]) dfs(v);
 }
