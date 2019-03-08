@@ -2,45 +2,51 @@
 
 using namespace std;
 
-const int N = 1e5+5;
-
-int n, m;
+const int N = 1<<17;
 
 struct node {
-	int ps, ss, mx, sm;
-	node() : ps(0), ss(0), mx(0), sm(0) {}
-	node(int ps, int ss, int mx, int sm) : ps(ps), ss(ss), mx(mx), sm(sm) {}
-	friend node operator+(const node &a, const node &b) {
-		node ret;
-		ret.ps = max(a.ps, a.sm+b.ps);
-		ret.ss = max(b.ss, a.ss+b.sm);
-		ret.mx = max({a.mx, b.mx, a.ss+b.ps});
-		ret.sm = a.sm+b.sm;
-		return ret;
-	}
-} t[N<<1];
+    int pre, suf, sum, mx;
+    node() { };
+    node(int pre, int suf, int sum, int mx) : pre(pre), suf(suf), sum(sum), mx(mx) { }
+    friend node operator+(const node &a, const node &b) {
+        node ret;
+        ret.pre = max(a.pre, a.sum + b.pre);
+        ret.suf = max(b.suf, b.sum + a.suf);
+        ret.sum = a.sum + b.sum;
+        ret.mx = max({a.mx, b.mx, a.suf + b.pre});
+        return ret;
+    }
+};
 
-void update(int x, int k) {
-	for(t[x += n] = node(k, k, k, k); x != 1; x >>= 1) {
-		if(x & 1) t[x>>1] = t[x^1] + t[x];
-		else t[x>>1] = t[x] + t[x^1];
-	}
+int n, m, A[N];
+node t[N<<1];
+
+void build(int p = 1, int l = 1, int r = n) {
+    if(l == r) return void(t[p] = node(A[l], A[l], A[l], A[l]));
+    int mid = (l + r) >> 1;
+    build(p<<1, l, mid), build(p<<1|1, mid+1, r);
+    t[p] = t[p<<1] + t[p<<1|1];
+}
+
+void update(int x, int k, int p = 1, int l = 1, int r = n) {
+    if(l == r) return void(t[p] = node(k, k, k, k));
+    int mid = (l + r) >> 1;
+    if(x <= mid) update(x, k, p<<1, l, mid);
+    else update(x, k, p<<1|1, mid+1, r);
+    t[p] = t[p<<1] + t[p<<1|1];
 }
 
 int main() {
-	scanf("%d %d", &n, &m);
-	for(int i = 0, a; i < n; i++) {
-		scanf("%d", &a);
-		t[n+i] = node(a, a, a, a);
-	}
-	for(int i = n-1; i; i--) t[i] = t[i<<1] + t[i<<1|1];
-	printf("%d\n", t[1].mx);
-	while(m--) {
-		int a, b;
-		scanf("%d %d", &a, &b);
-		update(a, b);
-		printf("%d\n", t[1].mx);
-	}
+    scanf("%d %d", &n, &m);
+    for(int i = 1; i <= n; i++) scanf("%d", A+i);
+    build();
+    printf("%d\n", t[1].mx);
+    for(int i = 1, a, b; i <= m; i++) {
+        scanf("%d %d", &a, &b);
+        ++a;
+        update(a, b);
+        printf("%d\n", t[1].mx);
+    }
 
-	return 0;
+    return 0;
 }
