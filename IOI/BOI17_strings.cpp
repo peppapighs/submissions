@@ -41,12 +41,11 @@ void push(pitem t) {
 	if(t->l) t->l->lz ^= 1, swap(t->l->h, t->l->rh);
 	if(t->r) t->r->lz ^= 1, swap(t->r->h, t->r->rh);
 	t->lz = 0;
-	updt(t);
 }
 
 void split(pitem t, pitem &l, pitem &r, int pos, int add = 0) {
-	if(!t) return void(l = r = NULL);
 	push(t);
+	if(!t) return void(l = r = NULL);
 	int cur_pos = add+sz(t->l)+1;
 	if(cur_pos <= pos) split(t->r, t->r, r, pos, cur_pos), l = t;
 	else split(t->l, l, t->l, pos, add), r = t;
@@ -55,18 +54,10 @@ void split(pitem t, pitem &l, pitem &r, int pos, int add = 0) {
 
 void merge(pitem &t, pitem l, pitem r) {
 	push(l), push(r);
-	if(!l || !r) t = l ? l : r;
-	else if(l->prio < r->prio) merge(l->r, l->r, r), t = l;
+	if(!l || !r) return void(t = l ? l : r);
+	if(l->prio < r->prio) merge(l->r, l->r, r), t = l;
 	else merge(r->l, l, r->l), t = r;
 	updt(t);
-}
-
-void print(pitem t) {
-	push(t);
-	if(!t) return;
-	print(t->l);
-	printf("%c", t->c);
-	print(t->r);
 }
 
 int n, m;
