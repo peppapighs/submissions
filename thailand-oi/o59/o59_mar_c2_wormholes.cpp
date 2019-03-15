@@ -17,7 +17,7 @@ map<pii, vector<pii> > mp;
 int get(pii x) { return lower_bound(coord.begin(), coord.end(), x) - coord.begin(); }
 
 int main() {
-    fill_n(ap[0], 35*35, 1e12);
+    fill_n(ap[0], 65*65, 1e12);
     scanf("%d %d", &k, &m);
     for(int i = 1; i <= k; i++) {
         long a, b, c, d;

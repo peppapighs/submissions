@@ -7,34 +7,25 @@ using namespace std;
 const int N = 1e5+5;
 
 int n, ans;
-long T, t[N], A[N];
-vector<long> V;
-
-int get(int x) { return lower_bound(V.begin(), V.end(), x) - V.begin(); }
-
-void update(int x, int k) { for(int i = x+1; i; i -= i & -i) t[i] += k; }
-
-long query(int x) {
-    long ret = 0;
-    for(int i = x+1; i < N; i += i & -i) ret += t[i];
-    return ret;
-}
+long T, mx = -1, x[N], v[N];
+vector<int> V;
 
 int main() {
     scanf("%d %lld", &n, &T);
     for(int i = 1; i <= n; i++) {
-        long a, b;
-        scanf("%lld %lld", &b, &a);
-        A[i] = a * T + b;
-        V.emplace_back(a * T + b);
+        scanf("%lld %lld", x+i, v+i);
+        V.emplace_back(i);
     }
-    sort(V.begin(), V.end());
-    V.erase(unique(V.begin(), V.end()), V.end());
-    for(int i = 1; i <= n; i++) {
-        if(!query(get(A[i]))) ++ans;
-        update(get(A[i]), 1);
+    sort(V.begin(), V.end(), [&](const int &a, const int &b) {
+        if(x[a] != x[b]) return x[a] < x[b];
+        else return v[a] > v[b];
+    });
+    for(int i : V) {
+        long now = x[i] + (T * v[i]);
+        if(mx >= now) ++ans;
+        mx = max(mx, now);
     }
-    printf("%d\n", ans);
+    printf("%d\n", n - ans);
 
     return 0;
 }

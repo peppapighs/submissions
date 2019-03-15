@@ -30,7 +30,7 @@ int main() {
         g[b].emplace_back(a, i, 1);
         sum += weight[i];
     }
-    euler(1);
+    for(int i = 1; i <= n; i++) if(g[i].size()) euler(i);
     for(int i = 1; i <= m; i++) if(rev[i]) ++cnt, ret += weight[i];
     bool valid = (ret << 1) > sum ? 1 : 0;
     printf("%d\n", valid ? m - cnt : cnt);
