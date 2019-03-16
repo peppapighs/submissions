@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 
+#define iii tuple<double, int, int>
 #define long long long
 
 using namespace std;
@@ -7,64 +8,73 @@ using namespace std;
 const int N = 2e3+5;
 const int M = 2e5+5;
 
-struct query {
-    int idx;
-    long p, b, e;
-    query(int idx, long p, long b, long e) : idx(idx), p(p), b(b), e(e) {}
-    friend bool operator<(const query &a, const query &b) {
-        return a.p < b.p;
+struct item {
+    int y, idx;
+    long l, r;
+    item(int y, int idx, long l, long r) : y(y), idx(idx), l(l), r(r) { }
+    friend bool operator<(const item &a, const item &b) {
+        return a.y < b.y;
     }
 };
 
-int n, m, ans[M];
-long V[N], T[N];
-vector<int> L;
-vector<tuple<double, int, int> > P;
-map<int, int> mp;
-vector<query> Q;
+int n, m, ptr, ans[M], pos[N], mp[N];
+long v[N], t[N];
+vector<item> Q;
+vector<iii> inter;
 
 int main() {
+    iota(pos, pos+N, 0);
+
     scanf("%d %d", &n, &m);
-    for(int i = 1; i <= n; i++) scanf("%lld %lld", T+i, V+i);
+    for(int i = 1; i <= n; i++) scanf("%lld %lld", t+i, v+i);
+    t[n+1] = v[n+1] = 1e10;
+
     for(int i = 1; i <= n; i++) for(int j = i+1; j <= n; j++) {
-        double yinter = (1.0*V[i]*V[j]*(T[j] - T[i])) / (1.0*(V[j] - V[i]));
-        if(yinter >= 0) P.emplace_back(yinter, i, j);
+        long m1 = v[i], c1 = v[i] * t[i], m2 = v[j], c2 = v[j] * t[j];
+        double yinter = (double)(c1 * m2 - c2 * m1) / (double)(m2 - m1);
+        if(yinter > 0) inter.emplace_back(yinter, i, j);
     }
-    sort(P.begin(), P.end());
-    for(int i = 1; i <= n; i++) L.emplace_back(i);
-    sort(L.begin(), L.end(), [&](const int &a, const int &b) {
-        return T[a] < T[b];
-    });
-    for(int i = 0; i < n; i++) mp[L[i]] = i;
-    for(int i = 1; i <= m; i++) {
-        long p, b, e;
-        scanf("%lld %lld %lld", &p, &b, &e);
-        Q.emplace_back(i, p, b, e);
+
+    for(int i = 1, a, b, c; i <= m; i++) {
+        scanf("%d %d %d", &a, &b, &c); 
+        Q.emplace_back(a, i, b, c);
     }
+
     sort(Q.begin(), Q.end());
-    int ptr = 0;
-    for(query q : Q) {
-        while(ptr < P.size() && get<0>(P[ptr]) <= q.p) {
-            int a = get<1>(P[ptr]), b = get<2>(P[ptr]);
-            swap(L[mp[a]], L[mp[b]]);
+    sort(inter.begin(), inter.end());
+    sort(pos+1, pos+n+1, [&](const int &a, const int &b) {
+        return t[a] < t[b];
+    });
+
+    for(int i = 1; i <= n; i++) mp[pos[i]] = i;
+
+    for(item q : Q) {
+        int y = q.y, idx = q.idx;
+        long l = q.l, r = q.r;
+
+        while(ptr < (int)inter.size() && get<0>(inter[ptr]) <= (double)y) {
+            int a = get<1>(inter[ptr]), b = get<2>(inter[ptr]);
+            swap(pos[mp[a]], pos[mp[b]]);
             swap(mp[a], mp[b]);
             ++ptr;
         }
-        int hi, low;
-        int l = 0, r = n-1;
-        while(l < r) {
-            int mid = (l + r + 1) >> 1;
-            if(q.p + V[L[mid]]*T[L[mid]] <= q.e*V[L[mid]]) l = mid;
-            else r = mid-1; 
+        int L = 1, R = n;
+        while(L < R) {
+            int mid = (L + R) >> 1;
+            double coord = (double)(y + v[mid] * t[mid]) / (double)v[mid];
+            if(l <= coord) R = mid;
+            else L = mid + 1;
         }
-        hi = l, l = 0, r = n-1;
-        while(l < r) {
-            int mid = (l + r) >> 1;
-            if(q.p + V[L[mid]]*T[L[mid]] >= q.b*V[L[mid]]) r = mid;
-            else l = mid+1;
+        int a = R;
+        L = 1, R = n + 1;
+        while(L < R) {
+            int mid = (L + R) >> 1;
+            double coord = (double)(y + v[mid] * t[mid]) / (double)v[mid];
+            if(r < coord) R = mid;
+            else L = mid + 1;
         }
-        low = l;
-        ans[q.idx] = hi - low + 1;
+        int b = R;
+        ans[idx] = b - a;
     }
     for(int i = 1; i <= m; i++) printf("%d\n", ans[i]);
 
