@@ -6,7 +6,7 @@ const int N = 1e5+5;
 
 int n, m, l;
 int low[N], disc[N], d[N];
-bool ap[N], sub[N];
+bool ap[N];
 vector<int> g[N];
 
 bool tarjan(int u, int p) {
@@ -17,9 +17,7 @@ bool tarjan(int u, int p) {
         if(!disc[v]) {
             bool b = tarjan(v, u);
             low[u] = min(low[u], low[v]);
-            if(u != p && low[v] >= disc[u]) ap[u] = true;
-
-            if(b && low[v] >= disc[u]) sub[u] = true;
+            if(b && low[v] >= disc[u]) ap[u] = true;
             valid |= b;
         } else low[u] = min(low[u], disc[v]);
     }
@@ -45,7 +43,7 @@ int main() {
         }
     }
 
-    for(int i = 2; i < n; i++) if(ap[i] && sub[i])
+    for(int i = 2; i < n; i++) if(ap[i])
         vec.emplace_back(i);
     sort(vec.begin(), vec.end(), [&](const int &a, const int &b) {
         return d[a] < d[b];
