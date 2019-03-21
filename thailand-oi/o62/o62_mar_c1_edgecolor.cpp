@@ -80,8 +80,6 @@ int main() {
     for(int i = 1, T, a, b; i <= m; i++) {
         scanf("%d %d %d", &T, &a, &b);
         pitem tmp, l, r;
-        while(!root(t[a]));
-        while(!root(t[b]));
         if(T == 1) {
             if(root(t[a]) != root(t[b])) {
                 if(getpos(t[a]) == 1) root(t[a])->lz ^= 1;
