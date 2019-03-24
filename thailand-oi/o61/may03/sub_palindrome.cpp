@@ -86,20 +86,22 @@ void count_palindrome() {
 int get(int i, long x) { return lower_bound(vec[i].begin(), vec[i].end(), x) - vec[i].begin() + 1; }
 
 void coord_compress() {
-    for(int i = 1; i <= n; i++) {
-        vec[0].emplace_back(g(0, i));
-        vec[1].emplace_back(g(1, i));
-        vec[2].emplace_back(g(2, i));
-        vec[3].emplace_back(g(3, i));
-    }
+    for(int i = 1; i <= n; i++) for(int j = 0; j < 4; j++)
+        vec[j].emplace_back(g(j, i));
     for(int i = 0; i < 4; i++) sort(vec[i].begin(), vec[i].end());
     t[0][0] = t[1][0] = t[2][0] = t[3][0] = build();
-    for(int i = 1; i <= n; i++) {
-        t[0][i] = update(get(0, g(0, i)), pii(g(0, i), 1), t[0][i-1]);
-        t[1][i] = update(get(1, g(1, i)), pii(g(1, i), 1), t[1][i-1]);
-        t[2][i] = update(get(2, g(2, i)), pii(g(2, i), 1), t[2][i-1]);
-        t[3][i] = update(get(3, g(3, i)), pii(g(3, i), 1), t[3][i-1]);
-    }
+    for(int i = 1; i <= n; i++) for(int j = 0; j < 4; j++) 
+        t[j][i] = update(get(j, g(j, i)), pii(g(j, i), 1), t[j][i-1]);
+}
+
+long calc(int a, int b, int l, int r) {
+    int mid = (l + r) >> 1;
+    pii lhs = query(t[a][l-1], t[a][mid], 1-l, a);
+    pii rhs = query(t[b][mid], t[b][r], r+1, b);
+    long now = f(l, mid) - f(mid+1, r) + lhs.x + rhs.x;
+    now += 1ll * (1 - l) * (mid - l + 1 - lhs.y);
+    now += 1ll * (r + 1) * (r - mid - rhs.y);
+    return now;
 }
 
 int main() {
@@ -109,18 +111,7 @@ int main() {
     scanf("%d", &q);
     for(int i = 1, l, r; i <= q; i++) {
         scanf("%d %d", &l, &r);
-        int mid = (l + r) >> 1;
-        long ans = (f(l, mid) - f(mid+1, r)) + (f(l+1, mid) - f(mid+1, r));
-        
-        pii ret1 = query(t[0][l-1], t[0][mid], 1-l, 0);
-        pii ret2 = query(t[1][mid], t[1][r], r+1, 1);
-        ans += ret1.x + ret2.x + 1ll * (1-l) * (mid - l + 1 - ret1.y) + 1ll * (r+1) * (r - mid - ret2.y);
-
-        ret1 = query(t[2][l], t[2][mid], -l, 2);
-        ret2 = query(t[3][mid], t[3][r], r+1, 3);
-        ans += ret1.x + ret2.x + 1ll * (-l) * (mid - l - ret1.y) + 1ll * (r+1) * (r - mid - ret2.y);
-
-        printf("%lld\n", ans);
+        printf("%lld\n", calc(0, 1, l, r) + calc(2, 3, l+1, r));
     }
 
     return 0;
