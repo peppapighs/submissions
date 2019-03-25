@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 
 #define long long long
-#define pii pair<int, int>
+#define pii pair<long, long>
 #define x first
 #define y second
 
