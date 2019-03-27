@@ -20,10 +20,7 @@ struct cht {
     void add(long m, long c) {
         line now(m, c);
         while(l.size() > 1 && bad(l[l.size() - 2], l[l.size() - 1], now)) l.pop_back();
-        if(!l.empty()) {
-            if(l.back().m == now.m && now.c <= l.back().c) l.pop_back();
-            if(l.back().c == now.c && now.m <= l.back().m) l.pop_back();
-        }
+        if(!l.empty() && l.back().m == now.m && now.c <= l.back().c) l.pop_back();
         l.emplace_back(now);
     }
     long query(long x) {
