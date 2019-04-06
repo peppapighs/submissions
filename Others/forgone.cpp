@@ -10,14 +10,25 @@ void solve(int idx) {
     memset(S, 0, sizeof S), A.clear(), B.clear();
     scanf(" %s", S+1);
     n = strlen(S+1);
+    for(int i = 1; i <= n; i++) S[i] -= (int)'0';
     for(int i = n; i; i--) {
-        if(S[i] == '4') A.emplace_back(2), B.emplace_back(2);
-        else if(S[i] == '0') A.emplace_back(0), B.emplace_back(0);
-        else if(S[i] == '5') A.emplace_back(2), B.emplace_back(3);
-        else A.emplace_back(1), B.emplace_back(S[i] - '0' - 1);
+        if((S[i] == '0' || S[i] == '1') && i > 1) {
+            int pos = i-1;
+            S[i] += 10;
+            while(S[pos] == 0) S[pos--] = 9;
+            --S[pos];
+        }
+        bool valid = false;
+        for(int j = 1; j < S[i]; j++) {
+            if(j == 4 || S[i] - j == 4 || S[i] - j > 9) continue;
+            A.emplace_back(j), B.emplace_back(S[i] - j); 
+            valid = true;
+            break;
+        }
+        if(!valid) A.emplace_back(0), B.emplace_back(S[i]);
     }
-    assert(B.size() != 1 || B[0]);
-    while(B.size() > 1 && !B.back()) B.pop_back();
+    while(!A.back()) A.pop_back();
+    while(!B.back()) B.pop_back();
     reverse(A.begin(), A.end()), reverse(B.begin(), B.end());
     printf("Case #%d: ", idx);
     for(int d : A) printf("%d", d);
