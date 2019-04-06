@@ -5,47 +5,43 @@
 using namespace std;
 
 const int N = 105;
+const long INF = 1e18;
 
-int n, l;
-long k;
-int A[N], pos[N];
-long t[N][N];
+void add(long &a, long b) { a += b; if(a > INF) a = INF; }
 
-void update(long t[], int x, long v) { for(int i = x+1; i > 0; i -= i & -i) t[i-1] += v; }
-
-long query(long t[], int x) {
-    long ret = 0;
-    for(int i = x+1; i <= n; i += i & -i) ret += t[i-1];
-    return ret;
-}
-
-long get(long t[], int x) { return query(t, x) - query(t, x+1); }
+int n, l, A[N], pos[N];
+long K, dp[N][N];
 
 int main() {
-    scanf("%d %d %lld", &n, &l, &k);
+    scanf("%d %d %lld", &n, &l, &K);
     for(int i = 1; i <= n; i++) scanf("%d", A+i), pos[A[i]] = i;
-    for(int i = n; i; i--) for(int j = 0; j <= l; j++)
-        update(t[j], A[i], (j == 0) + query(t[j], A[i]) + (j ? query(t[j-1], 0) - query(t[j-1], A[i]) : 0));
+    for(int i = n; i; i--) {
+        dp[i][0] = 1;
+        for(int j = i+1; j <= n; j++) for(int k = 0; k <= l; k++) {
+            if(A[i] < A[j]) add(dp[i][k], dp[j][k]);
+            else if(k) add(dp[i][k], dp[j][k-1]);
+        }
+    }
     int ptr = 0, skip = 0;
     vector<int> ans;
-    for(int it = 0; it < n; it++) {
-        bool have = true;
+    for(int step = 1; step <= n; step++) {
+        bool have = false;
         for(int i = 0; i < n; i++) {
-            if(pos[i] <= ptr || k < 0) continue;
-            long sum = 0;
-            for(int j = 0; j <= l - skip - (i < A[ptr]); j++) sum += get(t[j], i);
-            if(k - sum < 0) {
+            if(pos[i] <= ptr || K < 0) continue;
+            long now = 0;
+            for(int j = 0; j <= l - skip - (i < A[ptr]); j++) add(now, dp[pos[i]][j]);
+            if(K < now) {
                 ans.emplace_back(i);
                 if(i < A[ptr]) ++skip;
-                ptr = pos[i], --k;
-                have = false;
-                break;
-            } else k -= sum;
+                ptr = pos[i], --K;
+                have = true;
+                break; 
+            } else K -= now;
         }
-        if(have) break;
+        if(!have) break;
     }
-    if(ans.empty()) return !printf("-1\n");
-    for(int a : ans) printf("%d ", a);
+    if(ans.empty()) printf("-1");
+    else for(int i : ans) printf("%d ", i);
     printf("\n");
 
     return 0;
