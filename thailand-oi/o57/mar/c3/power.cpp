@@ -18,12 +18,13 @@ void findcyc(int u, int p) {
     S.emplace_back(u);
     for(int v : g[u]) if(v != p) {
         if(!col[v]) findcyc(v, u);
-        else if(col[v] == 1) while(C.empty() || C.back() != v) {
-            in[S.back()] = 1;
-            C.emplace_back(S.back());
-            S.pop_back();
+        else if(col[v] == 1) for(int i = S.size()-1; ~i; i--) {
+            C.emplace_back(S[i]);
+            in[S[i]] = 1;
+            if(S[i] == v) break;
         }
     }
+    S.pop_back();
     col[u] = 2;
 }
 
