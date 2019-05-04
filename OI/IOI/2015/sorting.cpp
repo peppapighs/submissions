@@ -43,9 +43,8 @@ int findSwapPairs(int n, int s[], int m, int x[], int y[], int p[], int q[]) {
             p[i] = pos[a], q[i] = pos[b];
             swap(s[pos[a]], s[pos[b]]);
             swap(pos[a], pos[b]);
-        }
+        } else p[i] = q[i] = 0;
     }
-    for(int i = ans.size(); i < r; i++) p[i] = 0, q[i] = 0;
 
     return r;
 }
