@@ -5,9 +5,8 @@ using namespace std;
 const int N = 5e5+5;
  
 int n, k, ans;
-int qs[N], col[N], deg[N];
+int qs[N], col[N];
 vector<int> g[N], st[N];
-vector<pair<int, int> > E;
  
 int par[N][20], dep[N];
  
@@ -49,7 +48,6 @@ int main() {
         scanf("%d %d", &a, &b);
         g[a].emplace_back(b);
         g[b].emplace_back(a);
-        E.emplace_back(a, b);
     }
     init_lca(1, 0);
     for(int i = 1, a; i <= n; i++) {
