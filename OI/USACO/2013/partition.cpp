@@ -6,6 +6,9 @@ int n, k, A[20][20];
 int ans = 1e9;
 
 int main() {
+    freopen("partition.in", "r", stdin);
+    freopen("partition.out", "w", stdout);
+
     scanf("%d %d", &n, &k);
     for(int i = 1; i <= n; i++) for(int j = 1; j <= n; j++) scanf("%d", &A[i][j]);
     for(int bit = 0; bit <= 1 << (n-1); bit++) {
