@@ -14,6 +14,9 @@ long L[N], R[N], dp[N][2], ans;
 vector<pii> E;
 
 int main() {
+    freopen("route.in", "r", stdin);
+    freopen("route.out", "w", stdout);
+
     scanf("%d %d %d", &n, &m, &r);
     for(int i = 1; i <= n; i++) scanf("%lld", L+i), dp[i][0] = L[i];
     for(int i = 1; i <= m; i++) scanf("%lld", R+i), dp[i][1] = R[i];
