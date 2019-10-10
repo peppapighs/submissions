@@ -1,72 +1,73 @@
 #include "sort_weight.h"
 #include <bits/stdc++.h>
 
+#define pii pair<int, int>
+#define x first
+#define y second
+
 using namespace std;
 
-bool leq(int a, int b) {
-    return sort_weight(a, b) == 1;
-}
+const int N = 1e3+5;
 
-void ans(int a, int b, int c, int d, int e) {
-    vector<int> ret(5);
-    ret[a] = 0, ret[b] = 1, ret[c] = 2, ret[d] = 3, ret[e] = 4;
-    sort_answer(ret[0], ret[1], ret[2], ret[3], ret[4]);
-}
+int tree[N];
+vector<vector<int> > perm;
+vector<pii> op;
 
-int T;
-vector<int> V(5);
+bool solve(vector<int> &now, int p, int sz) {
+    if(now.size() > sz) return false;
+    if(now.size() <= 1) return true;
+    for(int i = 1; i <= op.size(); i++) {
+        pii z = op[i - 1];
+        vector<int> l, r;
+        for(int idx : now) {
+            if(perm[idx][z.x] < perm[idx][z.y]) l.emplace_back(idx);
+            else r.emplace_back(idx);
+        }
+        bool a = solve(l, p<<1, sz / 2);
+        bool b = solve(r, p<<1|1, sz / 2);
+        if(a && b) {
+            tree[p] = i;
+            return true;
+        }
+    }
+    return false;
+}
 
 int main() {
-    T = get_case();
+    vector<int> vec = {0, 1, 2, 3, 4};
+    do perm.emplace_back(vec);
+    while(next_permutation(vec.begin(), vec.end()));
+
+    for(int i = 0; i < 5; i++) for(int j = i + 1; j < 5; j++)
+        op.emplace_back(i, j);
+
+    vector<int> now(120);
+    iota(now.begin(), now.end(), 0);
+    solve(now, 1, 128);
+
+    int T = get_case();
     while(T--) {
         sort_init();
-        for(int i = 0; i < 5; i++) V[i] = i;
-        if(!leq(V[0], V[1])) swap(V[0], V[1]);
-        if(!leq(V[2], V[3])) swap(V[2], V[3]);
-        if(!leq(V[1], V[3])) swap(V[1], V[3]), swap(V[0], V[2]);
-        if(leq(V[4], V[1])) {
-            //V[4] -> _ V[0] _ V[1] V[3]
-            if(leq(V[4], V[0])) {
-                //V[4] V[0] V[1] V[3]
-                if(leq(V[2], V[0])) {
-                    if(leq(V[2], V[4])) ans(V[2], V[4], V[0], V[1], V[3]);
-                    else ans(V[4], V[2], V[0], V[1], V[3]);
-                } else {
-                    if(leq(V[2], V[1])) ans(V[4], V[0], V[2], V[1], V[3]);
-                    else ans(V[4], V[0], V[1], V[2], V[3]);
-                }
-            } else {
-                //V[0] V[4] V[1] V[3]
-                if(leq(V[2], V[4])) {
-                    if(leq(V[2], V[0])) ans(V[2], V[0], V[4], V[1], V[3]);
-                    else ans(V[0], V[2], V[4], V[1], V[3]);
-                } else {
-                    if(leq(V[2], V[1])) ans(V[0], V[4], V[2], V[1], V[3]);
-                    else ans(V[0], V[4], V[1], V[2], V[3]); 
-                }
+        vector<int> now(120);
+        iota(now.begin(), now.end(), 0);
+
+        int p = 1;
+        while(now.size() > 1) {
+            vector<int> vec;
+            pii z = op[tree[p] - 1];
+            int ask = sort_weight(z.x, z.y);
+            for(int idx : now) {
+                if(ask == 1 && perm[idx][z.x] < perm[idx][z.y])
+                    vec.emplace_back(idx);
+                if(ask == -1 && perm[idx][z.x] > perm[idx][z.y])
+                    vec.emplace_back(idx);
             }
-        } else {
-            //V[4] -> V[0] V[1] _ V[3] _
-            if(leq(V[4], V[3])) {
-                //V[0] V[1] V[4] V[3]
-                if(leq(V[2], V[1])) {
-                    if(leq(V[2], V[0])) ans(V[2], V[0], V[1], V[4], V[3]);
-                    else ans(V[0], V[2], V[1], V[4], V[3]);
-                } else {
-                    if(leq(V[2], V[4])) ans(V[0], V[1], V[2], V[4], V[3]);
-                    else ans(V[0], V[1], V[4], V[2], V[3]);
-                }
-            } else {
-                //V[0] V[1] V[3] V[4]
-                if(leq(V[2], V[1])) {
-                    if(leq(V[2], V[0])) ans(V[2], V[0], V[1], V[3], V[4]);
-                    else ans(V[0], V[2], V[1], V[3], V[4]);
-                } else {
-                    if(leq(V[2], V[3])) ans(V[0], V[1], V[2], V[3], V[4]);
-                    else ans(V[0], V[1], V[3], V[2], V[4]);
-                }
-            }
+            p = ask == 1 ? p<<1 : p<<1|1;
+            swap(vec, now);
         }
+        int ans[5];
+        for(int i = 0; i < 5; i++) ans[i] = perm[now[i]][0];
+        sort_answer(ans[0], ans[1], ans[2], ans[3], ans[4]);
     }
 
     return 0;
