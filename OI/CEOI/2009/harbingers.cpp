@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 
 #define long long long
-#define pii pair<long, long>
+#define pii pair<int, int>
 #define x first
 #define y second
 
@@ -9,55 +9,69 @@ using namespace std;
 
 const int N = 1e5+5;
 
-struct PersistentLiChaoTree {
-    struct item {
-        pii val;
-        item *l, *r;
-        item(pii val, item *l, item *r) : val(val), l(l), r(r) {}
-    };
-    item *ver[N];
+long ans[N];
+vector<int> coord;
 
-    long f(long x, pii l) { return l.x * x + l.y; }
+struct item {
+    pii val;
+    int l, r;
+    item() {}
+    item(pii val, int l, int r) : val(val), l(l), r(r) {}
+} t[9 * N];
 
-    item* newleaf(pii val) { return new item(val, NULL, NULL); }
-    item* newpar(pii val, item* l, item *r) { return new item(val, l, r); }
+long f(int x, pii l) { return 1ll * l.x * x + ans[l.y]; };
 
-    item* update(pii k, item *p, int l = 1, int r = 1e9) {
-        if(!p) return newleaf(k);
+int ptr;
 
-        if(f(l, k) < f(l, p->val) && f(r, k) < f(r, p->val)) return newpar(k, p->l, p->r);
-        if(f(l, k) > f(l, p->val) && f(r, k) > f(r, p->val)) return p;
+int newleaf(pii x) {
+    t[++ptr].val = x;
+    t[ptr].l = -1, t[ptr].r = -1;
+    return ptr;
+}
 
-        int m = (l + r) >> 1;
-        bool lef = f(l, k) < f(l, p->val);
-        bool mid = f(m, k) < f(m, p->val);
+int newpar(pii x, int l, int r) {
+    t[++ptr].val = x;
+    t[ptr].l = l, t[ptr].r = r;
+    return ptr;
+}
 
-        if(l == r) return newleaf(mid ? k : p->val);
-        if(lef != mid) return newpar(mid ? k : p->val, update(mid ? p->val : k, p->l, l, m), p->r);
-        else return newpar(mid ? k : p->val, p->l, update(mid ? p->val : k, p->r, m+1, r));
-    }
+int m, L, M, R;
 
-    long get(int x, item *p, int l = 1, int r = 1e9) {
-        int m = (l + r) >> 1;
-        if(!p) return 1e18;
-        if(l == r) return f(x, p->val);
-        if(x < m) return min(f(x, p->val), get(x, p->l, l, m));
-        else return min(f(x, p->val), get(x, p->r, m+1, r));
-    }
-} t;
+int add(pii k, int p, int l = 1, int r = coord.size()) {
+    m = (l + r) >> 1;
+    L = coord[l-1], M = coord[m-1], R = coord[r-1];
+    if(p == -1 || p > ptr) return newleaf(k);
+    if(f(L, k) <= f(L, t[p].val) && f(R, k) <= f(R, t[p].val)) return newpar(k, t[p].l, t[p].r);
+    if(f(L, k) >= f(L, t[p].val) && f(R, k) >= f(R, t[p].val)) return p;
+
+    bool lef = f(L, k) < f(L, t[p].val);
+    bool mid = f(M, k) < f(M, t[p].val);
+    pii ret = t[p].val;
+    if(mid) swap(ret, k);
+    if(lef != mid) return newpar(ret, add(k, t[p].l, l, m), t[p].r);
+    else return newpar(ret, t[p].l, add(k, t[p].r, m + 1, r));
+}
+
+long get(int x, int p, int l = 1, int r = coord.size()) {
+    m = (l + r) >> 1;
+    L = coord[l-1], M = coord[m-1], R = coord[r-1];
+    if(p == -1 || p > ptr) return 1e18;
+    if(x <= M) return min(f(x, t[p].val), get(x, t[p].l, l, m));
+    else return min(f(x, t[p].val), get(x, t[p].r, m + 1, r));
+}
 
 int n;
 vector<pii> g[N];
-long S[N], V[N], d[N], ans[N];
+int S[N], V[N], ver[N];
 
-void dfs(int u, int p) {
-    if(u != 1) ans[u] = t.get(V[u], t.ver[p]) + V[u] * d[u] + S[u];
-    if(u != 1) t.ver[u] = t.update(pii(-d[u], ans[u]), t.ver[p]);
-    else t.ver[u] = t.newleaf(pii(0, 0));
-    for(pii v : g[u]) if(v.x != p) {
-        d[v.x] = d[u] + v.y;
-        dfs(v.x, u);
-    }
+void dfs(int u, int p, int d) {
+    if(u != 1) ans[u] = get(V[u], ver[p]) + 1ll * d * V[u] + S[u];
+    if(u != 1) ver[u] = add(pii(-d, u), ver[p]);
+    else ver[u] = newleaf(pii(0, 0));
+
+    for(pii v : g[u]) if(v.x != p) dfs(v.x, u, d + v.y);
+
+    ptr = ver[u];
 }
 
 int main() {
@@ -67,8 +81,14 @@ int main() {
         g[a].emplace_back(b, c);
         g[b].emplace_back(a, c);
     }
-    for(int i = 2; i <= n; i++) scanf("%lld %lld", S+i, V+i);
-    dfs(1, 1);
+    for(int i = 2; i <= n; i++) {
+        scanf("%d %d", S + i, V + i);
+        coord.emplace_back(V[i]);
+    }
+    sort(coord.begin(), coord.end());
+    coord.resize(unique(coord.begin(), coord.end()) - coord.begin());
+
+    dfs(1, 0, 0);
 
     for(int i = 2; i <= n; i++) printf("%lld ", ans[i]);
     printf("\n");
