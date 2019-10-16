@@ -33,22 +33,15 @@ int n;
 long a, b, c;
 long pref[N], dp[N];
 
-void solve() {
-    hull.clear(), hull.add(0, 0);
+int main() {
     scanf("%d %lld %lld %lld", &n, &a, &b, &c);
+    hull.add(0, 0);
     for(int i = 1; i <= n; i++) {
         scanf("%lld", pref+i), pref[i] += pref[i-1];
         dp[i] = hull.query(pref[i]) + (a * pref[i] * pref[i] + b * pref[i] + c);
         hull.add(-2ll * a * pref[i], a * pref[i] * pref[i] - b * pref[i] + dp[i]);
     }
     printf("%lld\n", dp[n]);
-}
-
-int T;
-
-int main() {
-    scanf("%d", &T);
-    while(T--) solve();
 
     return 0;
 }
