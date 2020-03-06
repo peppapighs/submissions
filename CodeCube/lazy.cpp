@@ -2,42 +2,22 @@
 
 using namespace std;
 
-const int N = 2e5+5;
+const int N = 1e5+5;
 
-map<int,int> comp;
-vector<int> idx[N];
-int n,q,ptr=1;
-
-int que(int k,int x) {
-	int l=0,r=idx[comp[x]].size();
-	int ret=0;
-	while(l<=r) {
-		int mid=(l+r)>>1;
-		if(idx[comp[x]][mid]<=k) {
-			ret = mid;
-			l=mid+1;
-		} else {
-			r=mid-1;
-		}
-	}
-	return ret;
-}
+int n, q;
+map<int, vector<int> > mp;
 
 int main() {
-	scanf("%d%d",&n,&q);
-	for(int i=1;i<=n;i++) {
-		int a;
-		scanf("%d",&a);
-		if(comp.find(a)==comp.end()) {
-			comp[a]=ptr++;
-		}
-		idx[comp[a]].emplace_back(i);
+	scanf("%d %d", &n, &q);
+	for(int i = 1, a; i <= n; i++) {
+		scanf("%d", &a);
+		mp[a].emplace_back(i);
 	}
-	while(q--) {
-		int l,r,x;
-		scanf("%d%d%d",&l,&r,&x);
-		int a=que(l,x),b=que(r,x);
-		printf("%d\n",b-a+1);
+	for(int i = 1, l, r, c; i <= q; i++) {
+		scanf("%d %d %d", &l, &r, &c);
+		auto it1 = lower_bound(mp[c].begin(), mp[c].end(), l);
+		auto it2 = upper_bound(mp[c].begin(), mp[c].end(), r);
+		printf("%d\n", it2 - it1);
 	}
 
 	return 0;
