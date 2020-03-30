@@ -92,8 +92,7 @@ int main() {
         for(pii p : out[i]) tree.update2d(get(Y, p.x), p.y, -1);
         for(iii e : Q[i]) {
             int a, b, idx; tie(a, b, idx) = e;
-            int now = tree.query2d(get(Y, b) - 1, idx - T, idx + T) - tree.query2d(get(Y, a), idx - T, idx + T);
-            ans += now;
+            ans += tree.query2d(get(Y, b) - 1, idx - T, idx + T) - tree.query2d(get(Y, a), idx - T, idx + T);
         }
         for(pii p : in[i]) tree.update2d(get(Y, p.x), p.y, 1);
     }
