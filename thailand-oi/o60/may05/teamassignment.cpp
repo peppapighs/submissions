@@ -5,32 +5,24 @@ using namespace std;
 const int N = 1e5+5;
 
 int n, a, b;
-int A[N], dp[N<<1];
-
-void update(int x) { for(dp[x += N] = true; x != 1; x >>= 1) dp[x>>1] = dp[x] | dp[x^1]; }
-
-bool query(int l, int r) {
-    bool ret = false;
-    for(l += N, r += N + 1; l < r; l >>= 1, r >>= 1) {
-        if(l & 1) ret |= dp[l++];
-        if(r & 1) ret |= dp[--r];
-    }
-    return ret;
-}
+int A[N], dp[N];
 
 bool f(int m) {
     memset(dp, 0, sizeof dp);
-    set<int, greater<int> > S;
-    update(0);
-    for(int i = 1; i < a; i++) if(A[i] >= m) S.emplace(i);
+    deque<int> pos;
+    vector<int> T;
+    dp[0] = 1, T.emplace_back(0);
+    for(int i = 1; i < a; i++) if(A[i] >= m) pos.emplace_back(i);
     for(int i = a; i <= n; i++) {
-        if(A[i] >= m) S.emplace(i);
-        if(i - b > 0) S.erase(i - b);
-        if(S.empty()) continue;
-        int Q = *S.begin();
-        if(query(max(0, i-b), min(i-a, Q-1))) update(i);
+        if(A[i] >= m) pos.emplace_back(i);
+        if(!pos.empty() && pos.front() == i - b) pos.pop_front();
+        if(pos.empty()) continue;
+
+        int last = pos.back(), x = max(0, i - b), y = min(i - a, last - 1);
+        int chk = upper_bound(T.begin(), T.end(), y) - lower_bound(T.begin(), T.end(), x);
+        if(chk) dp[i] = 1, T.emplace_back(i);
     }
-    return query(n, n);
+    return (bool)dp[n];
 }
 
 int main() {
@@ -41,7 +33,7 @@ int main() {
     while(l < r) {
         int m = (l + r + 1) >> 1;
         if(f(m)) l = m, valid = true;
-        else r = m-1;
+        else r = m - 1;
     }
     if(valid) printf("%d\n", l);
     else printf("-1\n");
