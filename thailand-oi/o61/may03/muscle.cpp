@@ -12,16 +12,13 @@ int query(int x, int ret = 0) { for(int i = x; i; i -= i & -i) ret += t[i]; retu
 
 int main() {
     scanf("%d", &n);
-    for(int i = 1; i <= n; i++) scanf("%d", A+i), update(i, 1);
+    for(int i = 1; i <= n; i++) scanf("%d", A + i), update(i, 1);
     for(int i = n; i; i--) {
-        int l = 1, r = n;
-        while(l < r) {
-            int mid = (l + r) >> 1;
-            if(query(mid) >= i - A[i]) r = mid;
-            else l = mid + 1;
-        }
-        ans[i] = r;
-        update(r, -1);
+        int pos = 0, x = i - A[i];
+        for(int j = 19; ~j; j--) if(pos + (1 << j) <= n && t[pos + (1 << j)] < x)
+            x -= t[pos += (1 << j)];
+        ans[i] = pos + 1;
+        update(pos + 1, -1);
     }
     for(int i = 1; i <= n; i++) printf("%d ", ans[i]);
     printf("\n");
