@@ -13,6 +13,7 @@ Problem Sources:
  - [atcoder](https://atcoder.jp/)
  - [dunjudge](https://dunjudge.me/)
  - [Thailand OI](https://evaluator.thailandoi.org/)
+ - [programming.in.th](https://beta.programming.in.th)
  - [Google Codejam](https://codingcompetitions.withgoogle.com/codejam)
  - [USA Computing Olympiad](http://www.usaco.org/index.php)
  - [ProProg](https://www.proprog.ml/)
