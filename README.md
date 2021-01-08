@@ -22,8 +22,8 @@ For those who interest in solving OI problems, here is [my OI Checklist](http://
 
 Submissions from my fellow competitive programmers:
 
- - [szawinis's](https://github.com/szawinis/CompetitiveProgramming)
- - [win11905's](https://github.com/win11905/submission)
- - [Autoratch's](https://github.com/Autoratch/submissions)
+ - [@szawinis](https://github.com/szawinis/CompetitiveProgramming)
+ - [@win11905](https://github.com/win11905/submission)
+ - [@Autoratch](https://github.com/Autoratch/submissions)
 
 Happy Coding!
