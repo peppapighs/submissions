@@ -20,4 +20,10 @@ Problem Sources:
  
 For those who interest in solving OI problems, here is [my OI Checklist](http://oichecklist.pythonanywhere.com/view/086e878e181029264e6e16354d6e95efae0145cd/)
 
+Submissions from my fellow competitive programmers:
+
+ - [szawinis's](https://github.com/szawinis/CompetitiveProgramming)
+ - [win11905's](https://github.com/win11905/submission)
+ - [Autoratch's](https://github.com/Autoratch/submissions)
+
 Happy Coding!
