@@ -14,7 +14,7 @@ void solve(int idx) {
     printf("Case #%d: ", idx);
 
     long sum = abs(x) + abs(y);
-    if(sum % 2 == 0) {
+    if (sum % 2 == 0) {
         printf("IMPOSSIBLE\n");
         return;
     }
@@ -22,18 +22,18 @@ void solve(int idx) {
     bool valid = false;
     long all = (1ll << 31) - 1, a = 0, b = 0;
 
-    for(int i = 30; ~i; i--) {
+    for (int i = 30; ~i; i--) {
         int now = 1 << i;
         all -= now;
-        if(all < sum) {
+        if (all < sum) {
             long na = a + now, nb = b;
-            if(abs(a + now - x) + abs(b - y) <= all) {
+            if (abs(a + now - x) + abs(b - y) <= all) {
                 a += now;
                 ans.emplace_back('E');
-            } else if(abs(a - now - x) + abs(b - y) <= all) {
+            } else if (abs(a - now - x) + abs(b - y) <= all) {
                 a -= now;
                 ans.emplace_back('W');
-            } else if(abs(a - x) + abs(b + now - y) <= all) {
+            } else if (abs(a - x) + abs(b + now - y) <= all) {
                 b += now;
                 ans.emplace_back('N');
             } else {
@@ -43,7 +43,8 @@ void solve(int idx) {
         }
     }
     reverse(ans.begin(), ans.end());
-    for(int c : ans) printf("%c", c);
+    for (int c : ans)
+        printf("%c", c);
     printf("\n");
 }
 
@@ -51,7 +52,8 @@ int T;
 
 int main() {
     scanf("%d", &T);
-    for(int i = 1; i <= T; i++) solve(i);
+    for (int i = 1; i <= T; i++)
+        solve(i);
 
     return 0;
 }

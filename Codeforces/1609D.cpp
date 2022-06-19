@@ -15,20 +15,22 @@ int main() {
 
     scanf("%d %d", &n, &d);
     int excess = 0;
-    for(int i = 1, a, b; i <= d; i++) {
+    for (int i = 1, a, b; i <= d; i++) {
         scanf("%d %d", &a, &b);
-        if(find(a) == find(b)) ++excess;
+        if (find(a) == find(b))
+            ++excess;
         else {
             a = find(a), b = find(b);
             sz[a] += sz[b];
             par[b] = a;
         }
         vector<int> total_sz;
-        for(int j = 1; j <= n; j++) if(find(j) == j)
-            total_sz.emplace_back(sz[j]);
+        for (int j = 1; j <= n; j++)
+            if (find(j) == j)
+                total_sz.emplace_back(sz[j]);
         sort(total_sz.begin(), total_sz.end(), greater<int>());
         int ans = 0;
-        for(int i = 0; i <= min(excess, (int)total_sz.size() - 1); i++)
+        for (int i = 0; i <= min(excess, (int)total_sz.size() - 1); i++)
             ans += total_sz[i];
         printf("%d\n", ans - 1);
     }

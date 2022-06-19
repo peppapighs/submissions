@@ -10,26 +10,26 @@ int main() {
     scanf("%d", &q);
 
     int counter = 0;
-    while(q--) {
+    while (q--) {
         int T, a;
         scanf("%d", &T);
-        if(T == 1) {
+        if (T == 1) {
             scanf("%d", &a);
             ++counter;
-            pos[a] = 1 - counter; 
+            pos[a] = 1 - counter;
             Q.emplace_front(a);
-        } else if(T == 2) {
+        } else if (T == 2) {
             scanf("%d", &a);
             pos[a] = Q.size() + 1 - counter;
             Q.emplace_back(a);
-        } else if(T == 3) {
+        } else if (T == 3) {
             --counter;
             pos.erase(Q.front());
             Q.pop_front();
-        } else if(T == 4) {
+        } else if (T == 4) {
             pos.erase(Q.back());
             Q.pop_back();
-        } else if(T == 5) {
+        } else if (T == 5) {
             scanf("%d", &a);
             printf("%d\n", pos[a] + counter);
         } else {

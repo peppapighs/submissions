@@ -27,7 +27,8 @@ struct UnionFind {
 
     void unite(int a, int b) {
         a = find(a), b = find(b);
-        if(a == b) return;
+        if (a == b)
+            return;
         par[a] = b, l[b] = min(l[b], l[a]), r[b] = max(r[b], r[a]);
     }
 } dsu;
@@ -36,17 +37,19 @@ int n, k;
 long t[N << 1], lz[N << 1];
 
 void push(var) {
-    if(lz[p] != 0) {
+    if (lz[p] != 0) {
         t[p] += lz[p];
-        if(l != r) lz[p << 1] += lz[p], lz[p << 1 | 1] += lz[p];
+        if (l != r)
+            lz[p << 1] += lz[p], lz[p << 1 | 1] += lz[p];
         lz[p] = 0;
     }
 }
 
 void update(int x, int y, long k, var) {
     push(p, l, r);
-    if(x > r || l > y) return;
-    if(x <= l && r <= y) {
+    if (x > r || l > y)
+        return;
+    if (x <= l && r <= y) {
         lz[p] += k, push(p, l, r);
         return;
     }
@@ -56,8 +59,10 @@ void update(int x, int y, long k, var) {
 
 long query(int x, int y, var) {
     push(p, l, r);
-    if(x > r || l > y) return 0;
-    if(x <= l && r <= y) return t[p];
+    if (x > r || l > y)
+        return 0;
+    if (x <= l && r <= y)
+        return t[p];
     return max(query(x, y, lb), query(x, y, rb));
 }
 
@@ -68,54 +73,58 @@ bitset<N> chk;
 
 int main() {
     scanf("%d", &n);
-    for(int i = 1; i <= n; i++) {
+    for (int i = 1; i <= n; i++) {
         scanf("%d", A + i);
         Y[A[i] + 1].emplace_back(i);
     }
     scanf("%d", &k);
 
     long sum = 0;
-    for(int i = 1, x, y, c; i <= k; i++) {
+    for (int i = 1, x, y, c; i <= k; i++) {
         scanf("%d %d %d", &x, &y, &c);
         star_x[x].emplace_back(y, c);
         sum += c;
     }
-    for(int i = 1; i <= n; i++) {
+    for (int i = 1; i <= n; i++) {
         sort(star_x[i].begin(), star_x[i].end());
         int pre = 0;
-        for(pii p : star_x[i]) if(p.y > pre) {
-            star_y[p.x].emplace_back(i, p.y - pre);
-            pre = p.y;
-        }
+        for (pii p : star_x[i])
+            if (p.y > pre) {
+                star_y[p.x].emplace_back(i, p.y - pre);
+                pre = p.y;
+            }
     }
 
-    for(int i = 1; i <= n + 1; i++) {
-        for(int x : Y[i]) {
+    for (int i = 1; i <= n + 1; i++) {
+        for (int x : Y[i]) {
             long val_l = 0, val_r = 0;
-            if(x > 1 && chk[x - 1]) {
+            if (x > 1 && chk[x - 1]) {
                 int par_l = dsu.find(x - 1);
                 val_l = query(dsu.l[par_l], dsu.r[par_l]);
             }
-            if(x < n && chk[x + 1]) {
+            if (x < n && chk[x + 1]) {
                 int par_r = dsu.find(x + 1);
                 val_r = query(dsu.l[par_r], dsu.r[par_r]);
             }
-            if(x > 1 && chk[x - 1]) {
+            if (x > 1 && chk[x - 1]) {
                 int par_l = dsu.find(x - 1);
                 update(dsu.l[par_l], dsu.r[par_l], val_r);
             }
-            if(x < n && chk[x + 1]) {
+            if (x < n && chk[x + 1]) {
                 int par_r = dsu.find(x + 1);
                 update(dsu.l[par_r], dsu.r[par_r], val_l);
             }
             update(x, x, val_l + val_r);
-            if(x > 1 && chk[x - 1]) dsu.unite(x - 1, x);
-            if(x < n && chk[x + 1]) dsu.unite(x, x + 1);
+            if (x > 1 && chk[x - 1])
+                dsu.unite(x - 1, x);
+            if (x < n && chk[x + 1])
+                dsu.unite(x, x + 1);
             chk[x] = 1;
         }
-        for(pii p : star_y[i]) update(p.x, p.x, p.y);
+        for (pii p : star_y[i])
+            update(p.x, p.x, p.y);
     }
-    
+
     printf("%lld\n", sum - t[1]);
 
     return 0;

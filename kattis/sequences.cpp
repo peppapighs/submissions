@@ -8,10 +8,12 @@ const int N = 5e5 + 5;
 const int M = 1e9 + 7;
 
 long modpow(long a, long b) {
-    if(b < 0) return 0;
+    if (b < 0)
+        return 0;
     long ret = 1;
-    for( ; b; b >>= 1) {
-        if(b & 1) ret = ret * a % M;
+    for (; b; b >>= 1) {
+        if (b & 1)
+            ret = ret * a % M;
         a = a * a % M;
     }
     return ret;
@@ -23,21 +25,24 @@ char S[N];
 int main() {
     scanf(" %s", S + 1);
     n = strlen(S + 1);
-    for(int i = 1; i <= n; i++) {
-        if(S[i] == '?') ++cnt_q;
-        if(S[i] == '1') ++cnt_o;
+    for (int i = 1; i <= n; i++) {
+        if (S[i] == '?')
+            ++cnt_q;
+        if (S[i] == '1')
+            ++cnt_o;
     }
 
     long ans = 0;
-    for(int i = 1, a = 0, b = 0; i <= n; i++) {
-        if(S[i] == '?') {
+    for (int i = 1, a = 0, b = 0; i <= n; i++) {
+        if (S[i] == '?') {
             ans = (ans + (modpow(2, cnt_q - 2) * a % M)) % M;
             ans = (ans + (modpow(2, cnt_q - 1) * b % M)) % M;
             ++a;
-        } else if(S[i] == '0') {
+        } else if (S[i] == '0') {
             ans = (ans + (modpow(2, cnt_q - 1) * a % M)) % M;
             ans = (ans + (modpow(2, cnt_q) * b % M)) % M;
-        } else ++b;
+        } else
+            ++b;
     }
     printf("%lld\n", ans);
 

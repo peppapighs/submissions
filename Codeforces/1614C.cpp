@@ -13,11 +13,12 @@ void solve() {
     scanf("%d %d", &n, &m);
     int total = 0;
     long pow2 = 1;
-    for(int i = 1, a, b, c; i <= m; i++) {
+    for (int i = 1, a, b, c; i <= m; i++) {
         scanf("%d %d %d", &a, &b, &c);
         total |= c;
     }
-    for(int i = 1; i < n; i++) pow2 = pow2 * 2 % M;
+    for (int i = 1; i < n; i++)
+        pow2 = pow2 * 2 % M;
     printf("%lld\n", pow2 * total % M);
 }
 
@@ -25,7 +26,8 @@ int T;
 
 int main() {
     scanf("%d", &T);
-    while(T--) solve();
+    while (T--)
+        solve();
 
     return 0;
 }

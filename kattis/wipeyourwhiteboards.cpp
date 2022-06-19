@@ -8,7 +8,7 @@ long gcd(long a, long b, long &s, long &t) {
     long ss = t = 0;
     long tt = s = 1;
 
-    while(b) {
+    while (b) {
         long q = a / b, tmp = b;
         b = a % b, a = tmp;
         tmp = ss, ss = s - q * ss, s = tmp;
@@ -40,7 +40,8 @@ int T;
 
 int main() {
     scanf("%d", &T);
-    while(T--) solve();
+    while (T--)
+        solve();
 
     return 0;
 }

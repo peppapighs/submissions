@@ -16,16 +16,17 @@ deque<pii> Q;
 
 int main() {
     scanf("%d %d %d", &R, &C, &k);
-    for(int i = 1; i <= R; i++) for(int j = 1; j <= C; j++)
-        scanf("%d", &A[i][j]);
-    
+    for (int i = 1; i <= R; i++)
+        for (int j = 1; j <= C; j++)
+            scanf("%d", &A[i][j]);
+
     int l = 0, r = 1e9;
-    while(l < r) {
+    while (l < r) {
         int mid = (l + r + 1) / 2;
 
         fill_n(dp[0], N * N, 1e9);
-        for(int i = 1; i <= C; i++) {
-            if(A[1][i] < mid) {
+        for (int i = 1; i <= C; i++) {
+            if (A[1][i] < mid) {
                 dp[1][i] = 1;
                 Q.emplace_back(1, i);
             } else {
@@ -34,26 +35,30 @@ int main() {
             }
         }
 
-        while(!Q.empty()) {
-            pii now = Q.front(); Q.pop_front();
-            for(int i = 0; i < 4; i++) {
+        while (!Q.empty()) {
+            pii now = Q.front();
+            Q.pop_front();
+            for (int i = 0; i < 4; i++) {
                 int nr = now.x + dx[i], nc = now.y + dy[i];
-                if(nr < 1 || nr > R || nc < 1 || nc > C)
+                if (nr < 1 || nr > R || nc < 1 || nc > C)
                     continue;
-                if(dp[nr][nc] > dp[now.x][now.y] + (A[nr][nc] < mid)) {
+                if (dp[nr][nc] > dp[now.x][now.y] + (A[nr][nc] < mid)) {
                     dp[nr][nc] = dp[now.x][now.y] + (A[nr][nc] < mid);
-                    if(A[nr][nc] < mid)
+                    if (A[nr][nc] < mid)
                         Q.emplace_back(nr, nc);
-                    else Q.emplace_front(nr, nc);
+                    else
+                        Q.emplace_front(nr, nc);
                 }
             }
         }
 
         bool valid = false;
-        for(int i = 1; i <= C; i++)
+        for (int i = 1; i <= C; i++)
             valid |= (dp[R][i] <= k);
-        if(valid) l = mid;
-        else r = mid - 1;
+        if (valid)
+            l = mid;
+        else
+            r = mid - 1;
     }
     printf("%d\n", l);
 

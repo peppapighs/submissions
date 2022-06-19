@@ -14,9 +14,9 @@ int n, D, pos[N];
 long t[N << 1], lz[N << 1];
 
 void push(int p, int l, int r) {
-    if(lz[p]) {
+    if (lz[p]) {
         t[p] += lz[p];
-        if(l != r) {
+        if (l != r) {
             lz[p << 1] += lz[p];
             lz[p << 1 | 1] += lz[p];
         }
@@ -26,8 +26,9 @@ void push(int p, int l, int r) {
 
 void update(int x, int y, long k, int p = 1, int l = 1, int r = n + 1) {
     push(p, l, r);
-    if(x > r || l > y) return;
-    if(x <= l && r <= y) {
+    if (x > r || l > y)
+        return;
+    if (x <= l && r <= y) {
         lz[p] += k, push(p, l, r);
         return;
     }
@@ -41,23 +42,23 @@ int main() {
 
     scanf("%d %d", &n, &D);
     vector<iii> vec;
-    for(int i = 1, a, b, x; i <= n; i++) {
+    for (int i = 1, a, b, x; i <= n; i++) {
         scanf("%d %d %d", &x, &a, &b);
         vec.emplace_back(x, a, b);
     }
     vec.emplace_back(D, 0, 1e9);
     sort(vec.begin(), vec.end());
-    sort(pos, pos + n + 1, [&](int a, int b) {
-        return get<2>(vec[a]) < get<2>(vec[b]);
-    });
-    for(int i = 0; i <= n; i++) {
+    sort(pos, pos + n + 1,
+         [&](int a, int b) { return get<2>(vec[a]) < get<2>(vec[b]); });
+    for (int i = 0; i <= n; i++) {
         update(i + 1, i + 1, get<0>(vec[i]));
         update(i + 2, n + 1, -get<1>(vec[i]));
     }
     long ans = 1e18;
-    for(int i = 0; i <= n; i++) {
+    for (int i = 0; i <= n; i++) {
         long now = t[1];
-        if(now <= get<2>(vec[pos[i]])) ans = min(ans, max(0ll, now));
+        if (now <= get<2>(vec[pos[i]]))
+            ans = min(ans, max(0ll, now));
         update(pos[i] + 1, pos[i] + 1, -get<0>(vec[pos[i]]));
         update(pos[i] + 2, n + 1, get<1>(vec[pos[i]]));
     }

@@ -7,7 +7,7 @@
 
 using namespace std;
 
-const int N = 1e5+5;
+const int N = 1e5 + 5;
 
 int n, k;
 long ans = LLONG_MAX, sum;
@@ -19,16 +19,18 @@ long d(pii a, pii b) { return abs(a.x - b.x) + abs(a.y - b.y); }
 
 void add(pii p) {
     auto pos = W.upper_bound(p);
-    if(W.empty()) return void(W.emplace(p));
-    if(pos == W.end()) {
+    if (W.empty())
+        return void(W.emplace(p));
+    if (pos == W.end()) {
         --pos;
         mp[p.x] = d(p, *pos);
         sum += mp[p.x];
-    } else if(pos == W.begin()) {
+    } else if (pos == W.begin()) {
         mp[pos->x] = d(*pos, p);
         sum += mp[pos->x];
     } else {
-        auto pre = pos; --pre;
+        auto pre = pos;
+        --pre;
         sum -= mp[pos->x];
         mp[pos->x] = d(*pos, p);
         mp[p.x] = d(p, *pre);
@@ -41,10 +43,11 @@ void del(pii p) {
     auto pos = W.find(p);
     auto l = pos, r = pos;
     --l, ++r;
-    if(pos == W.begin()) {
+    if (pos == W.begin()) {
         sum -= mp[r->x];
         mp[r->x] = 0;
-    } else if(r == W.end()) sum -= mp[p.x];
+    } else if (r == W.end())
+        sum -= mp[p.x];
     else {
         sum -= mp[r->x] + mp[p.x];
         mp[r->x] = d(*l, *r);
@@ -55,17 +58,17 @@ void del(pii p) {
 
 int main() {
     scanf("%d %d", &n, &k);
-    for(int i = 1, a, b; i <= n; i++) {
+    for (int i = 1, a, b; i <= n; i++) {
         scanf("%d %d", &a, &b);
         V.emplace_back(a, b);
     }
-    sort(V.begin(), V.end(), [&](const pii &a, const pii &b) {
-        return a.y < b.y;
-    });
-    for(int i = 0; i < k; i++) add(V[i]);
+    sort(V.begin(), V.end(),
+         [&](const pii &a, const pii &b) { return a.y < b.y; });
+    for (int i = 0; i < k; i++)
+        add(V[i]);
     ans = min(ans, sum);
-    for(int i = k; i < n; i++) {
-        del(V[i-k]), add(V[i]);
+    for (int i = k; i < n; i++) {
+        del(V[i - k]), add(V[i]);
         ans = min(ans, sum);
     }
     printf("%lld\n", ans);

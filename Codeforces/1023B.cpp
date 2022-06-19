@@ -13,13 +13,17 @@ pii mul(pii a, pii b) { return pii(a.x * b.x, a.y * b.y); }
 //-----------------------------------------------------------
 
 int main() {
-	long long n, k;
-	cin >> n >> k;
-	long long d = k >> 1;
-	if(n < k) d -= (k - n - 1);
-	if(k % 2 == 0) d--;
-	if(d < 0) printf("0");
-	else printf("%lld", d);
+    long long n, k;
+    cin >> n >> k;
+    long long d = k >> 1;
+    if (n < k)
+        d -= (k - n - 1);
+    if (k % 2 == 0)
+        d--;
+    if (d < 0)
+        printf("0");
+    else
+        printf("%lld", d);
 
-	return 0;
+    return 0;
 }

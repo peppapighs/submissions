@@ -9,7 +9,7 @@ using namespace std;
 const long INF = 1e18;
 
 class MaxFlow {
-private:
+  private:
     int n;
     vector<edge> E;
     vector<vector<int>> g;
@@ -17,15 +17,18 @@ private:
     unordered_map<int, int> mp;
 
     bool bfs(int s, int t) {
-        d.assign(n, -1); d[s] = 0;
+        d.assign(n, -1);
+        d[s] = 0;
         queue<int> Q({s});
 
-        while(!Q.empty()) {
-            int u = Q.front(); Q.pop();
-            if(u == t) break;
-            for(int &idx : g[u]) {
+        while (!Q.empty()) {
+            int u = Q.front();
+            Q.pop();
+            if (u == t)
+                break;
+            for (int &idx : g[u]) {
                 auto &[v, cap, flow] = E[idx];
-                if(cap - flow > 0 && d[v] == -1)
+                if (cap - flow > 0 && d[v] == -1)
                     d[v] = d[u] + 1, Q.emplace(v);
             }
         }
@@ -34,11 +37,13 @@ private:
     }
 
     long dfs(int u, int t, long f = INF) {
-        if(u == t || f == 0) return f;
-        for(int &i = last[u]; i < (int)g[u].size(); i++) {
+        if (u == t || f == 0)
+            return f;
+        for (int &i = last[u]; i < (int)g[u].size(); i++) {
             auto &[v, cap, flow] = E[g[u][i]];
-            if(d[v] != d[u] + 1) continue;
-            if(long pushed = dfs(v, t, min(f, cap - flow))) {
+            if (d[v] != d[u] + 1)
+                continue;
+            if (long pushed = dfs(v, t, min(f, cap - flow))) {
                 flow += pushed;
                 auto &rflow = get<2>(E[g[u][i] ^ 1]);
                 rflow -= pushed;
@@ -48,16 +53,14 @@ private:
         return 0;
     }
 
-    int hsh(int a, int b) {
-        return a * 1000 + b;
-    }
+    int hsh(int a, int b) { return a * 1000 + b; }
 
     void update(int u, int v, long k) {
         auto &flow = get<2>(E[mp[hsh(u, v)]]);
         flow += k;
     }
 
-public:
+  public:
     MaxFlow(int n) : n(n) {
         E.clear();
         g.assign(n, vector<int>());
@@ -75,9 +78,9 @@ public:
 
     long dinic(int s, int t) {
         long mf = 0;
-        while(bfs(s, t)) {
+        while (bfs(s, t)) {
             last.assign(n, 0);
-            while(long f = dfs(s, t))
+            while (long f = dfs(s, t))
                 mf += f;
         }
         return mf;
@@ -87,13 +90,14 @@ public:
         auto &[_, cap, flow] = E[mp[hsh(u, v)]];
 
         --cap;
-        if(flow == 0) return false;
+        if (flow == 0)
+            return false;
 
-        update(u, v, -1), update(s, u, -1), update(v, t, -1); 
+        update(u, v, -1), update(s, u, -1), update(v, t, -1);
         bool valid = (dinic(s, t) == 0);
-        if(valid) {
+        if (valid) {
             ++cap;
-            update(u, v, 1), update(s, u, 1), update(v, t, 1); 
+            update(u, v, 1), update(s, u, 1), update(v, t, 1);
         }
         return valid;
     }
@@ -105,39 +109,41 @@ int n, m;
 int team[N], prob[N];
 
 int main() {
-    while(scanf("%d %d", &n, &m), n != 0 || m != 0) {
+    while (scanf("%d %d", &n, &m), n != 0 || m != 0) {
         MaxFlow flow(n + m + 2);
         int s = n + m, t = n + m + 1;
 
         int sum = 0, cnt = 0;
-        for(int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++) {
             scanf("%d", team + i);
             flow.addEdge(s, i, team[i]);
             sum += team[i], cnt += team[i];
         }
-        for(int i = 0; i < m; i++) {
+        for (int i = 0; i < m; i++) {
             scanf("%d", prob + i);
             flow.addEdge(n + i, t, prob[i]);
             sum -= prob[i];
         }
-        if(sum != 0) {
+        if (sum != 0) {
             printf("Impossible\n\n");
             continue;
         }
 
-        for(int i = 0; i < n; i++) for(int j = 0; j < m; j++)
-            flow.addEdge(i, n + j, 1);
-        
-        if(flow.dinic(s, t) != cnt) {
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++)
+                flow.addEdge(i, n + j, 1);
+
+        if (flow.dinic(s, t) != cnt) {
             printf("Impossible\n\n");
             continue;
         }
 
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < m; j++) {
-                if(flow.necessary(i, n + j, s, t))
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (flow.necessary(i, n + j, s, t))
                     printf("Y");
-                else printf("N");
+                else
+                    printf("N");
             }
             printf("\n");
         }

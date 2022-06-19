@@ -16,20 +16,25 @@ char A[N][N];
 
 void gen_bee() {
     queue<pii> Q;
-    for(int i = 1; i <= n; i++) for(int j = 1; j <= n; j++) {
-        if(A[i][j] == 'M') sx = i, sy = j;
-        if(A[i][j] == 'H') {
-            bee[i][j] = 0;
-            Q.emplace(i, j);
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++) {
+            if (A[i][j] == 'M')
+                sx = i, sy = j;
+            if (A[i][j] == 'H') {
+                bee[i][j] = 0;
+                Q.emplace(i, j);
+            }
         }
-    }
-    while(!Q.empty()) {
-        pii u = Q.front(); Q.pop();
-        for(int i = 0; i < 4; i++) {
+    while (!Q.empty()) {
+        pii u = Q.front();
+        Q.pop();
+        for (int i = 0; i < 4; i++) {
             int nr = u.x + dx[i], nc = u.y + dy[i];
-            if(nr < 1 || nr > n || nc < 1 || nc > n) continue;
-            if(A[nr][nc] != 'G' && A[nr][nc] != 'M') continue;
-            if(bee[u.x][u.y] + 1 < bee[nr][nc]) {
+            if (nr < 1 || nr > n || nc < 1 || nc > n)
+                continue;
+            if (A[nr][nc] != 'G' && A[nr][nc] != 'M')
+                continue;
+            if (bee[u.x][u.y] + 1 < bee[nr][nc]) {
                 bee[nr][nc] = bee[u.x][u.y] + 1;
                 Q.emplace(nr, nc);
             }
@@ -38,41 +43,52 @@ void gen_bee() {
 }
 
 bool chk(int mid) {
-    if(1ll * mid >= bee[sx][sy]) return false;
-    fill_n(d[0], N*N, 1e9+1);
+    if (1ll * mid >= bee[sx][sy])
+        return false;
+    fill_n(d[0], N * N, 1e9 + 1);
     queue<pii> Q;
     d[sx][sy] = 0;
     Q.emplace(sx, sy);
-    while(!Q.empty()) {
-        pii u = Q.front(); Q.pop();
-        if(A[u.x][u.y] == 'D') return true;
-        for(int i = 0; i < 4; i++) {
+    while (!Q.empty()) {
+        pii u = Q.front();
+        Q.pop();
+        if (A[u.x][u.y] == 'D')
+            return true;
+        for (int i = 0; i < 4; i++) {
             int nr = u.x + dx[i], nc = u.y + dy[i];
-            if(nr < 1 || nr > n || nc < 1 || nc > n) continue;
-            if(A[nr][nc] != 'M' && A[nr][nc] != 'G' && A[nr][nc] != 'D') continue;
-            if(d[u.x][u.y] + 1 < d[nr][nc] && 1ll * d[u.x][u.y] + 1 < 1ll * s * (bee[nr][nc] - mid)) {
+            if (nr < 1 || nr > n || nc < 1 || nc > n)
+                continue;
+            if (A[nr][nc] != 'M' && A[nr][nc] != 'G' && A[nr][nc] != 'D')
+                continue;
+            if (d[u.x][u.y] + 1 < d[nr][nc] &&
+                1ll * d[u.x][u.y] + 1 < 1ll * s * (bee[nr][nc] - mid)) {
                 d[nr][nc] = d[u.x][u.y] + 1;
                 Q.emplace(nr, nc);
-            } 
+            }
         }
     }
     return false;
 }
 
 int main() {
-    fill_n(bee[0], N*N, 1e9+1);
+    fill_n(bee[0], N * N, 1e9 + 1);
     scanf("%d %d", &n, &s);
-    for(int i = 1; i <= n; i++) scanf(" %s", A[i] + 1);
+    for (int i = 1; i <= n; i++)
+        scanf(" %s", A[i] + 1);
     gen_bee();
 
     int l = 0, r = n * n;
-    while(l < r) {
+    while (l < r) {
         int mid = (l + r + 1) >> 1;
-        if(chk(mid)) l = mid;
-        else r = mid-1;
+        if (chk(mid))
+            l = mid;
+        else
+            r = mid - 1;
     }
-    if(chk(l)) printf("%d\n", l);
-    else printf("-1\n");
+    if (chk(l))
+        printf("%d\n", l);
+    else
+        printf("-1\n");
 
     return 0;
 }

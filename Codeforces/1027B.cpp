@@ -13,18 +13,18 @@ pii mul(pii a, pii b) { return pii(a.x * b.x, a.y * b.y); }
 //-----------------------------------------------------------
 
 int main() {
-	long long n, q;
-	cin >> n >> q;
-	while(q--) {
-		long long x, y;
-		cin >> x >> y;
-		long long t = (x-1)*n + y;
-		if((x+y) & 1) {
-			printf("%lld\n", (n*n+1)/2 + (t+1)/2);
-		} else {
-			printf("%lld\n", (t+1)/2);
-		}
-	}
+    long long n, q;
+    cin >> n >> q;
+    while (q--) {
+        long long x, y;
+        cin >> x >> y;
+        long long t = (x - 1) * n + y;
+        if ((x + y) & 1) {
+            printf("%lld\n", (n * n + 1) / 2 + (t + 1) / 2);
+        } else {
+            printf("%lld\n", (t + 1) / 2);
+        }
+    }
 
-	return 0;
+    return 0;
 }

@@ -10,16 +10,16 @@ void solve() {
     scanf("%d %d %d", &n, &a, &b);
     vector<int> ans;
     ans.emplace_back(0);
-    for(int i = 2; i <= n; i++) {
-
-    } 
+    for (int i = 2; i <= n; i++) {
+    }
 }
 
 int T;
 
 int main() {
     scanf("%d", &T);
-    while(T--) solve();
+    while (T--)
+        solve();
 
     return 0;
 }

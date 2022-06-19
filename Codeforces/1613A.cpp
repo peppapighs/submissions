@@ -12,14 +12,21 @@ void solve() {
     scanf("%lld %lld %lld %lld", &x1, &p1, &x2, &p2);
     long mn = min(p1, p2);
     p1 -= mn, p2 -= mn;
-    if(p1 > 10) printf(">\n");
-    else if(p2 > 10) printf("<\n");
+    if (p1 > 10)
+        printf(">\n");
+    else if (p2 > 10)
+        printf("<\n");
     else {
-        while(p1--) x1 *= 10;
-        while(p2--) x2 *= 10;
-        if(x1 < x2) printf("<\n");
-        else if(x1 > x2) printf(">\n");
-        else printf("=\n");
+        while (p1--)
+            x1 *= 10;
+        while (p2--)
+            x2 *= 10;
+        if (x1 < x2)
+            printf("<\n");
+        else if (x1 > x2)
+            printf(">\n");
+        else
+            printf("=\n");
     }
 }
 
@@ -27,7 +34,8 @@ int T;
 
 int main() {
     scanf("%d", &T);
-    while(T--) solve();
+    while (T--)
+        solve();
 
     return 0;
 }

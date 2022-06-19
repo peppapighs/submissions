@@ -11,31 +11,37 @@ string S;
 long pw[N];
 
 int main() {
-    ios_base::sync_with_stdio(0); cin.tie(0);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
 
     pw[0] = 1;
-    for(int i = 1; i < N; i++) pw[i] = pw[i - 1] * P;
+    for (int i = 1; i < N; i++)
+        pw[i] = pw[i - 1] * P;
 
-    while(getline(cin, S), !S.empty()) {
+    while (getline(cin, S), !S.empty()) {
         string str = "";
-        for(char &c : S) if(c != ' ')
-            str += c;
-        
-        for(int len = 1; len <= (int)str.size(); len++) {
+        for (char &c : S)
+            if (c != ' ')
+                str += c;
+
+        for (int len = 1; len <= (int)str.size(); len++) {
             map<long, int> mp;
             long hsh = 0;
-            for(int i = 0; i < len; i++)
+            for (int i = 0; i < len; i++)
                 hsh = hsh * P + (long)str[i];
             ++mp[hsh];
-            for(int i = len; i < (int)str.size(); i++) {
+            for (int i = len; i < (int)str.size(); i++) {
                 hsh = hsh * P + (long)str[i] - str[i - len] * pw[len];
                 ++mp[hsh];
             }
 
             int ans = 0;
-            for(auto &p : mp) ans = max(ans, p.second);
-            if(ans <= 1) break;
-            else cout << ans << "\n";
+            for (auto &p : mp)
+                ans = max(ans, p.second);
+            if (ans <= 1)
+                break;
+            else
+                cout << ans << "\n";
         }
         cout << "\n";
     }
